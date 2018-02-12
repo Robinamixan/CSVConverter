@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Main page{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2"></div>
+
+            <div class="col-lg-8">
+                <section class="loading_form">
+
+                    {{ form_start(form) }}
+                    {{ form_row(form.file) }}
+                    <div class="check_test">
+                        <span>Test mode</span>
+                        {{ form_row(form.flag_test_mode) }}
+                    </div>
+
+                    {{ form_row(form.save) }}
+                    {{ form_end(form) }}
+
+                    {% if loadReport %}
+
+                        <div id="load_report">
+                            <div>Load failed - {{ loadReport }}</div>
+                        </div>
+
+                    {% endif %}
+
+                    {% if failedRecords %}
+
+                        <div id="inserts_report">
+                            <div>Amount of processed inserts - {{ amountProcessed }}</div>
+                            <div>Amount of failed inserts - {{ amountFailed }}</div>
+                            <div>Amount of success inserts - {{ amountSuccesses }}</div>
+                            <div>
+                                Failed records:
+                                <table id="failed_records_list">
+                                    <thead>
+                                    <tr>
+                                        {% for key, contain in failedRecords[0] %}
+                                            <td>
+                                                {{ key }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for record in failedRecords %}
+                                        <tr>
+                                            {% for key, contain in record %}
+                                                <td>
+                                                    {{ contain }}
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                </section>
+            </div>
+
+            <div class="col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block stylesheets %}
+
+    <style>
+        .loading_form{
+            border: 2px solid #000000;
+            border-radius: 10px;
+            padding: 5px;
+            background-color: #384452;
+            margin: 30px;
+        }
+
+        .check_test {
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #files_load_form_file {
+            display: inline-block;
+        }
+
+        #load_report {
+            border: 2px solid #000000;
+            background-color: #FFFFFF;
+            margin: 20px;
+        }
+
+        #inserts_report {
+            background-color: #FFFFFF;
+            margin: 20px;
+        }
+
+        #failed_records_list{
+            border: 2px solid #000000;
+            background-color: #FFFFFF;
+        }
+
+        #failed_records_list tr , #failed_records_list td {
+            border: 1px solid #000000;
+        }
+
+        input[type="checkbox"]{
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: inline-block;
+        }
+    </style>
+
+{% endblock %}
