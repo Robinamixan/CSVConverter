@@ -27,7 +27,6 @@ class FilesLoadForm extends AbstractType
                 'required'   => true,
                 'attr' => array(
                     'class'         => 'btn btn-default',
-                    'placeholder'   => 'Quiz name',
                 )
             ))
 

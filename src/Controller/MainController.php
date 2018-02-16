@@ -20,7 +20,7 @@ class MainController extends Controller
     /**
      * Matches / exactly
      *
-     * @Route("/", name="blog_list")
+     * @Route("/", name="main_page")
      *
      * @param Request $request
      * @param Reader $reader
