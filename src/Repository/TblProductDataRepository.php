@@ -39,4 +39,36 @@ class TblProductDataRepository extends ServiceEntityRepository
         }
         return true;
     }
+
+    public function createEntityFromArray(array $item): TblProductData
+    {
+        $productData = new TblProductData();
+        $productData->setStrProductName($item['Product Name']);
+        $productData->setStrProductCode($item['Product Code']);
+        $productData->setStrProductDesc($item['Product Description']);
+        $productData->setIntProductStock($item['Stock']);
+        $productData->setFloatProductCost($item['Cost in GBP']);
+        $productData->setDtmAdded(new \DateTime());
+
+        if ($item['Discontinued'] == 'yes') {
+            $productData->setDtmDiscontinued(new \DateTime());
+        }
+        return $productData;
+    }
+
+    public function createArrayFromEntity(TblProductData $productData): array
+    {
+        $item = [];
+        $item['Product Code'] = $productData->getStrProductCode();
+        $item['Product Name'] = $productData->getStrProductName();
+        $item['Product Description'] = $productData->getStrProductDesc();
+        $item['Stock'] = $productData->getIntProductStock();
+        $item['Cost in GBP'] = $productData->getFloatProductCost();
+        if (!is_null($productData->getDtmDiscontinued())) {
+            $item['Discontinued'] = 'yes';
+        } else {
+            $item['Discontinued'] = null;
+        }
+        return $item;
+    }
 }

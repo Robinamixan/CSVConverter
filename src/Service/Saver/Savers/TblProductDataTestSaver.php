@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 13.2.18
- * Time: 18.48
- */
 
 namespace App\Service\Saver\Savers;
 
@@ -20,6 +14,7 @@ class TblProductDataTestSaver implements iSaver
     private $amountSuccessfulRecords;
     private $amountFailedInserts;
     private $entityManager;
+    private $entityRepository;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -28,6 +23,7 @@ class TblProductDataTestSaver implements iSaver
         $this->amountProcessedRecords = 0;
         $this->amountSuccessfulRecords = 0;
         $this->entityManager = $entityManager;
+        $this->entityRepository = $this->entityManager->getRepository(TblProductData::class);
     }
 
     public function saveArrayIntoEntity(array $contain): void
@@ -104,7 +100,7 @@ class TblProductDataTestSaver implements iSaver
             return false;
         }
 
-        if($this->isInEntity($item)) {
+        if($this->isInBD($item)) {
             return false;
         }
 
@@ -146,10 +142,9 @@ class TblProductDataTestSaver implements iSaver
         return true;
     }
 
-    private function isInEntity(array $item): bool
+    private function isInBD(array $item): bool
     {
-        $repository = $this->entityManager->getRepository(TblProductData::class);
-        $record = $repository->findByStrProductCode($item['Product Code']);
+        $record = $this->entityRepository->findByStrProductCode($item['Product Code']);
 
         if (!empty($record)) {
             return true;

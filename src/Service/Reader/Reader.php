@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 13.2.18
- * Time: 10.17
- */
 
 namespace App\Service\Reader;
 

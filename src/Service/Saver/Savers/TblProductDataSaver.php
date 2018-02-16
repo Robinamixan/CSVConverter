@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 13.2.18
- * Time: 18.48
- */
 
 namespace App\Service\Saver\Savers;
 
@@ -16,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class TblProductDataSaver implements iSaver
 {
     private $entityManager;
+    private $entityRepository;
     private $failedRecords;
     private $rightRecords;
     private $amountProcessedRecords;
@@ -30,6 +25,7 @@ class TblProductDataSaver implements iSaver
         $this->amountProcessedRecords = 0;
         $this->amountSuccessfulRecords = 0;
         $this->entityManager = $entityManager;
+        $this->entityRepository = $this->entityManager->getRepository(TblProductData::class);
     }
 
     public function saveArrayIntoEntity(array $contain): void
@@ -86,7 +82,8 @@ class TblProductDataSaver implements iSaver
             $this->amountProcessedRecords++;
             if ($this->isValidArray($item)) {
                 $this->amountSuccessfulRecords++;
-                $this->rightRecords[] = $this->createEntityFromArray($item);
+
+                $this->rightRecords[] = $this->entityRepository->createEntityFromArray($item);
             } else {
                 $this->amountFailedInserts++;
                 $this->failedRecords[] = $item;
@@ -111,7 +108,7 @@ class TblProductDataSaver implements iSaver
                     for ($j = $i; $j > $lastStep; $j--) {
                         if($this->isInBD($this->rightRecords[$j])) {
                             $this->entityManager->detach($this->rightRecords[$j]);
-                            $this->failedRecords[] = $this->createArrayFromEntity($this->rightRecords[$j]);
+                            $this->failedRecords[] = $this->entityRepository->createArrayFromEntity($this->rightRecords[$j]);
                             $this->amountSuccessfulRecords--;
                             $this->amountFailedInserts++;
                         } else {
@@ -135,38 +132,6 @@ class TblProductDataSaver implements iSaver
                 $this->entityManager->getConfiguration()
             );
         }
-    }
-
-    private function createEntityFromArray(array $item): TblProductData
-    {
-        $productData = new TblProductData();
-        $productData->setStrProductName($item['Product Name']);
-        $productData->setStrProductCode($item['Product Code']);
-        $productData->setStrProductDesc($item['Product Description']);
-        $productData->setIntProductStock($item['Stock']);
-        $productData->setFloatProductCost($item['Cost in GBP']);
-        $productData->setDtmAdded(new \DateTime());
-
-        if ($item['Discontinued'] == 'yes') {
-            $productData->setDtmDiscontinued(new \DateTime());
-        }
-        return $productData;
-    }
-
-    private function createArrayFromEntity(TblProductData $productData): array
-    {
-        $item = [];
-        $item['Product Code'] = $productData->getStrProductCode();
-        $item['Product Name'] = $productData->getStrProductName();
-        $item['Product Description'] = $productData->getStrProductDesc();
-        $item['Stock'] = $productData->getIntProductStock();
-        $item['Cost in GBP'] = $productData->getFloatProductCost();
-        if (!is_null($productData->getDtmDiscontinued())) {
-            $item['Discontinued'] = 'yes';
-        } else {
-            $item['Discontinued'] = null;
-        }
-        return $item;
     }
 
     private function isValidArray(array $item): bool
@@ -223,8 +188,7 @@ class TblProductDataSaver implements iSaver
 
     private function isInBD(TblProductData $item): bool
     {
-        $repository = $this->entityManager->getRepository(TblProductData::class);
-        $record = $repository->findByStrProductCode($item->getStrProductCode());
+        $record = $this->entityRepository->findByStrProductCode($item->getStrProductCode());
 
         if (!empty($record)) {
             return true;

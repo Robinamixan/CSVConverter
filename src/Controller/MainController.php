@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 13.2.18
- * Time: 15.07
- */
 
 namespace App\Controller;
 
 
 use App\Entity\File;
-use App\Entity\TblProductData;
 use App\Form\FilesLoadForm;
 use App\Service\Reader\Reader;
 use App\Service\Saver\Saver;
@@ -43,7 +36,6 @@ class MainController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $contain = [];
 
             $file = $loading_file->getFile();
             $contain = $reader->loadFile($file);
@@ -71,8 +63,8 @@ class MainController extends Controller
                     'loadReport' => $reader->getFailReport(),
                     'amountFails' => null,
                     'failedRecords' => null,
-                    'processedRecords' => null,
-                    'succesfulRecords' => null,
+                    'amountProcessed' => null,
+                    'amountSuccesses' => null,
                 ));
             }
         }
@@ -82,8 +74,8 @@ class MainController extends Controller
             'loadReport' => null,
             'amountFails' => null,
             'failedRecords' => null,
-            'processedRecords' => null,
-            'succesfulRecords' => null,
+            'amountProcessed' => null,
+            'amountSuccesses' => null,
         ));
     }
 }

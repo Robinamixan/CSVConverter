@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 14.2.18
- * Time: 13.37
- */
 
 namespace App\Tests\Entity;
 
