@@ -75,53 +75,6 @@
 
 {% block stylesheets %}
 
-    <style>
-        .loading_form{
-            border: 2px solid #000000;
-            border-radius: 10px;
-            padding: 5px;
-            background-color: #384452;
-            margin: 30px;
-        }
-
-        .check_test {
-            color: #FFFFFF;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #files_load_form_file {
-            display: inline-block;
-        }
-
-        #load_report {
-            border: 2px solid #000000;
-            background-color: #FFFFFF;
-            margin: 20px;
-        }
-
-        #inserts_report {
-            background-color: #FFFFFF;
-            margin: 20px;
-        }
-
-        #failed_records_list{
-            border: 2px solid #000000;
-            background-color: #FFFFFF;
-        }
-
-        #failed_records_list tr , #failed_records_list td {
-            border: 1px solid #000000;
-        }
-
-        input[type="checkbox"]{
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            display: inline-block;
-        }
-    </style>
+    <link href="{{ asset('assets/css/main.html.css') }}" rel="stylesheet">
 
 {% endblock %}

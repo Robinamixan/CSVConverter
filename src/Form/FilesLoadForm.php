@@ -8,7 +8,6 @@
 
 namespace App\Form;
 
-
 use App\Entity\File;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -19,38 +18,50 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FilesLoadForm extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('file', FileType::class, array(
-                'label' => false,
-                'required'   => true,
-                'attr' => array(
-                    'class'         => 'btn btn-default',
-                )
-            ))
-
-            ->add('flag_test_mode', CheckboxType::class, array(
-                'label' => false,
-                'required'   => false,
-                'attr' => array(
-                    'checked' => false,
-                    'hidden' => false,
-                )
-            ))
-
-            ->add('save', SubmitType::class, array(
-                'label' => 'Load File',
-                'attr' => array(
-                    'class'         => 'btn btn-default',
-                )
-            ))
-        ;
+            ->add(
+                'file',
+                FileType::class,
+                [
+                    'label' => false,
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'btn btn-default',
+                    ],
+                ]
+            )
+            ->add(
+                'flag_test_mode',
+                CheckboxType::class,
+                [
+                    'label' => false,
+                    'required' => false,
+                    'attr' => [
+                        'checked' => false,
+                        'hidden' => false,
+                    ],
+                ]
+            )
+            ->add(
+                'save',
+                SubmitType::class,
+                [
+                    'label' => 'Load File',
+                    'attr' => [
+                        'class' => 'btn btn-default',
+                    ],
+                ]
+            );
     }
-    public function configureOptions(OptionsResolver $resolver)
+
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => File::class,
-        ));
+        $resolver->setDefaults(
+            [
+                'data_class' => File::class,
+            ]
+        );
     }
 }

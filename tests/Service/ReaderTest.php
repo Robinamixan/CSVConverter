@@ -8,15 +8,14 @@
 
 namespace App\Tests\Service;
 
-
-use App\Service\Reader\Reader;
+use App\Service\FileReader\FileReader;
 use PHPUnit\Framework\TestCase;
 
 class ReaderTest extends TestCase
 {
     public function testReadFile()
     {
-        $reader = new Reader();
+        $reader = new FileReader();
         $testFilePath = 'tests/Service/testFile1.csv';
 
         file_put_contents($testFilePath, "a,b,c\n", FILE_APPEND);
@@ -25,7 +24,7 @@ class ReaderTest extends TestCase
         $testFile = new \SplFileObject($testFilePath, 'r');
 
         $testContain1 = [['a', 'b', 'c'], ['d', 'e', 'f']];
-        $testContain2 = $reader->loadFile($testFile);
+        $testContain2 = $reader->loadFileToArray($testFile);
 
         unlink($testFilePath);
         $this->assertEquals($testContain1, $testContain2);
@@ -33,18 +32,16 @@ class ReaderTest extends TestCase
 
     public function testErrorReadFile()
     {
-        $reader = new Reader();
+        $this->expectException(\InvalidArgumentException::class);
+
+        $reader = new FileReader();
         $testFilePath = 'tests/Service/testFile1.pdd';
 
         file_put_contents($testFilePath, "test", FILE_APPEND);
 
         $testFile = new \SplFileObject($testFilePath, 'r');
-        $reader->loadFile($testFile);
-
-        $testError1 = 'Unsupported type of input file';
-        $testError2 = $reader->getFailReport();
+        $reader->loadFileToArray($testFile);
 
         unlink($testFilePath);
-        $this->assertEquals($testError1, $testError2);
     }
 }

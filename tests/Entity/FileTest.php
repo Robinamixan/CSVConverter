@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity;
 
-
 use App\Entity\File;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

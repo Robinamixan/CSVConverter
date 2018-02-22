@@ -8,13 +8,13 @@
 
 namespace App\Tests\Controller;
 
-
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class MainControllerTest extends WebTestCase
 {
     /**
      * @dataProvider urlProvider
+     * @param $url
      */
     public function testPageIsSuccessful($url)
     {
