@@ -38,10 +38,10 @@ class ExceptionController extends BaseExceptionController
         $form = $this->builder->create(FilesLoadForm::class, $loadingFile);
         $form->handleRequest($request);
 
-        if ($exception->getMessage() !== "Unsupported type of input file") {
+        if ($exception->getMessage() !== 'Unsupported type of input file') {
             return new Response(
                 $this->twig->render(
-                    (string)$this->findTemplate(request, $request->getRequestFormat(), $code, $showException),
+                    (string) $this->findTemplate(request, $request->getRequestFormat(), $code, $showException),
                     [
                         'status_code' => $code,
                         'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',

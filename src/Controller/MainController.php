@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\File;
 use App\Form\FilesLoadForm;
 use App\Service\EntityConverter\EntityConverter;
+use App\Service\EntityValidator\ArrayToEntityValidators\ArrayToProductValidator;
+use App\Service\EntityValidator\EntityValidator;
 use App\Service\FileReader\FileReader;
 use App\Service\ArrayToEntitySaver\ArrayToEntitySaver;
-use App\Service\ArrayToEntitySaver\EntitySavers\ProductDataSaver;
-use App\Service\ArrayToEntitySaver\EntitySavers\ProductDataTestSaver;
+use App\Service\ArrayToEntitySaver\EntitySavers\ProductSaver;
+use App\Service\ArrayToEntitySaver\EntitySavers\ProductTestSaver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,6 +30,7 @@ class MainController extends Controller
      * @param ArrayToEntitySaver $arrayToEntitySaver
      * @param EntityManagerInterface $entityManager
      * @param EntityConverter $entityConverter
+     * @param EntityValidator $entityValidator
      * @param ValidatorInterface $validator
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -37,6 +40,7 @@ class MainController extends Controller
         ArrayToEntitySaver $arrayToEntitySaver,
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
+        EntityValidator $entityValidator,
         ValidatorInterface $validator
     ) {
         $loadingFile = new File();
@@ -44,10 +48,10 @@ class MainController extends Controller
         $templateArgs = [
             'form' => null,
             'loadReport' => null,
-            'amountFailed' => null,
-            'failedRecords' => null,
-            'amountProcessed' => null,
-            'amountSuccesses' => null,
+            'failedRecords' => [],
+            'amountFailed' => 0,
+            'amountProcessed' => 0,
+            'amountSuccesses' => 0,
         ];
 
         $form = $this->createForm(FilesLoadForm::class, $loadingFile);
@@ -56,40 +60,51 @@ class MainController extends Controller
         $templateArgs['form'] = $form->createView();
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $file = $loadingFile->getFile();
+            $productSaver = !$loadingFile->getFlagTestMode()
+                ? new ProductSaver($entityManager, $entityConverter, $validator)
+                : new ProductTestSaver($entityManager, $entityConverter, $validator);
+            $productValidator = new ArrayToProductValidator($entityConverter, $validator);
 
-            $fileContain = $fileReader->loadFileToArray($file);
 
-            if ($fileContain) {
-                if (!$loadingFile->getFlagTestMode()) {
-                    $arrayToEntitySaver->saveArrayIntoEntity(
-                        $fileContain,
-                        new ProductDataSaver($entityManager, $entityConverter, $validator)
-                    );
+            $fileReader->setFileForRead($file);
+            while ($item = $fileReader->getNextItem()) {
+                $templateArgs['amountProcessed']++;
+
+                if ($entityValidator->isValidItemToEntityRules($item, $productValidator)){
+                    $itemsBuffer[] = $item;
+
+                    if (count($itemsBuffer) === 5) {
+                        $arrayToEntitySaver->saveArrayIntoEntity($itemsBuffer, $productSaver);
+
+                        $templateArgs['failedRecords'] = array_merge(
+                            $templateArgs['failedRecords'],
+                            $arrayToEntitySaver->getFailedRecords()
+                        );
+
+                        $templateArgs['amountFailed'] += $arrayToEntitySaver->getAmountFailedInserts();
+                        $templateArgs['amountSuccesses'] += $arrayToEntitySaver->getAmountSuccessfulInserts();
+                        $itemsBuffer = [];
+                    }
                 } else {
-                    $arrayToEntitySaver->saveArrayIntoEntity(
-                        $fileContain,
-                        new ProductDataTestSaver($entityManager, $entityConverter, $validator)
-                    );
+                    $templateArgs['failedRecords'][] = $item;
+                    $templateArgs['amountFailed']++;
                 }
+            }
 
-                $templateArgs['failedRecords'] = $arrayToEntitySaver->getFailedRecords();
-                $templateArgs['amountFailed'] = $arrayToEntitySaver->getAmountFailedInserts();
-                $templateArgs['amountProcessed'] = $arrayToEntitySaver->getAmountProcessedRecords();
-                $templateArgs['amountSuccesses'] = $arrayToEntitySaver->getAmountSuccessfulRecords();
+            if (!empty($itemsBuffer)) {
+                $arrayToEntitySaver->saveArrayIntoEntity($itemsBuffer, $productSaver);
+                $templateArgs['failedRecords'] = array_merge(
+                    $templateArgs['failedRecords'],
+                    $arrayToEntitySaver->getFailedRecords()
+                );
+                $templateArgs['amountFailed'] += $arrayToEntitySaver->getAmountFailedInserts();
+                $templateArgs['amountSuccesses'] += $arrayToEntitySaver->getAmountSuccessfulInserts();
             }
         }
 
         return $this->render(
-            'FileParser/main.html.twig',
-            [
-                'form' => $templateArgs['form'],
-                'loadReport' => $templateArgs['loadReport'],
-                'amountFailed' => $templateArgs['amountFailed'],
-                'failedRecords' => $templateArgs['failedRecords'],
-                'amountProcessed' => $templateArgs['amountProcessed'],
-                'amountSuccesses' => $templateArgs['amountSuccesses'],
-            ]
-        );
+            'FileParser/main.html.twig', $templateArgs);
     }
 }

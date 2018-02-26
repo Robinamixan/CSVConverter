@@ -2,14 +2,14 @@
 
 namespace App\Service\EntityConverter\ArrayToEntityConverters;
 
-use App\Entity\ProductData;
+use App\Entity\Product;
 use App\Service\EntityConverter\IArrayToEntityConverter;
 
-class ArrayToProductDataConverter implements IArrayToEntityConverter
+class ArrayToProductConverter implements IArrayToEntityConverter
 {
-    public function convertArrayToEntity(array $item): ProductData
+    public function convertArrayToEntity(array $item): Product
     {
-        $productData = new ProductData();
+        $productData = new Product();
         $productData->setProductName($item['product_name']);
         $productData->setProductCode($item['product_code']);
         $productData->setProductDesc($item['product_description']);

@@ -18,6 +18,10 @@
                 <source>Load File</source>
                 <target>Load File</target>
             </trans-unit>
+            <trans-unit id="form_load_file_error_message">
+                <source>Any stock item which costs less that $5 and has less than 10 stock will not be imported.</source>
+                <target>Any stock item which costs less that $5 and has less than 10 stock will not be imported.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

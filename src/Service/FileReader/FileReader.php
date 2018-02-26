@@ -13,19 +13,30 @@ class FileReader
         $this->fileReader = null;
     }
 
-    public function loadFileToArray(\SplFileObject $file): array
+    public function setFileForRead(\SplFileObject $file): bool
     {
-        $this->fileReader = $this->getFileReader($file->getExtension());
-
-        return !is_null($this->fileReader) ? $this->fileReader->getFileContain($file) : [];
+        $this->fileReader = $this->getFileReader($file);
+        if (is_null($this->fileReader)) {
+            return false;
+        }
+        return true;
     }
 
-    private function getFileReader(string $input_format): ?IFileReader
+    public function getNextItem()
     {
-        if ($input_format == 'csv') {
-            return new CSVReader();
-        } else {
-            throw new \InvalidArgumentException('Unsupported type of input file');
+        if (is_null($this->fileReader)) {
+            return null;
         }
+        return $this->fileReader->getNextItem();
+    }
+
+    private function getFileReader(\SplFileObject $file): ?IFileReader
+    {
+        $input_format = $file->getExtension();
+        if ($input_format == 'csv') {
+            return new CSVReader($file);
+        }
+
+        throw new \InvalidArgumentException('Unsupported type of input file');
     }
 }

@@ -10,5 +10,5 @@ namespace App\Service\FileReader;
 
 interface IFileReader
 {
-    public function getFileContain(\SplFileObject $file): array;
+    public function getNextItem(): ?array;
 }

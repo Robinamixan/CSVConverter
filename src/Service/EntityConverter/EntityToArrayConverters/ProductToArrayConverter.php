@@ -10,7 +10,7 @@ namespace App\Service\EntityConverter\EntityToArrayConverters;
 
 use App\Service\EntityConverter\IEntityToArrayConverter;
 
-class ProductDataToArrayConverter implements IEntityToArrayConverter
+class ProductToArrayConverter implements IEntityToArrayConverter
 {
     public function convertEntityToArray(object $entity): array
     {

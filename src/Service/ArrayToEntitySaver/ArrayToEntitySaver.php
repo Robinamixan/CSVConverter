@@ -17,10 +17,10 @@ class ArrayToEntitySaver
         $this->entitySaver = null;
     }
 
-    public function saveArrayIntoEntity(array $contain, IEntitySaver $entitySaver): void
+    public function saveArrayIntoEntity(array $items, IEntitySaver $entitySaver): void
     {
         $this->entitySaver = $entitySaver;
-        $this->entitySaver->saveArrayIntoEntity($contain);
+        $this->entitySaver->saveArrayIntoEntity($items);
     }
 
     public function getFailedRecords(): array
@@ -33,13 +33,8 @@ class ArrayToEntitySaver
         return $this->entitySaver->getAmountFailedInserts();
     }
 
-    public function getAmountSuccessfulRecords(): int
+    public function getAmountSuccessfulInserts(): int
     {
-        return $this->entitySaver->getAmountSuccessfulRecords();
-    }
-
-    public function getAmountProcessedRecords(): int
-    {
-        return $this->entitySaver->getAmountProcessedRecords();
+        return $this->entitySaver->getAmountSuccessfulInserts();
     }
 }

@@ -6,19 +6,24 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+//@UniqueEntity("productCode")
+
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ProductDataRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  * @ORM\Table(name="tbl_product_data")
- * @UniqueEntity("productCode")
+ * @Assert\Expression(
+ *     "this.getProductStock() >= 10 or this.getProductCost() >= 5",
+ *     message="Any stock item which costs less that $5 and has less than 10 stock will not be imported."
+ * )
  */
-class ProductData
+class Product
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer", name="intProductDataId")
      */
-    private $productDataId;
+    private $productId;
 
     /**
      * @ORM\Column(type="string", name="strProductName", length=50, nullable=false)
@@ -39,19 +44,21 @@ class ProductData
     private $productCode;
 
     /**
-     * @ORM\Column(type="integer", name="intProductStock", nullable=false)
+     * @ORM\Column(type="integer", name="intProductStock", nullable=false, options={"unsigned"=true})
      * @Assert\NotBlank()
-     * @Assert\Range(
-     *      min = 10
-     * )
      */
     private $productStock;
 
     /**
-     * @ORM\Column(type="float", name="floatProductCost", nullable=false)
+     * @ORM\Column(type="decimal",
+     *     precision=8,
+     *     scale=2,
+     *     name="floatProductCost",
+     *     nullable=false,
+     *     options={"unsigned"=true}
+     *     )
      * @Assert\NotBlank()
      * @Assert\Range(
-     *      min = 5,
      *      max=1000
      * )
      */
@@ -76,9 +83,9 @@ class ProductData
     /**
      * @return int
      */
-    public function getProductDataId(): int
+    public function getProductId(): int
     {
-        return $this->productDataId;
+        return $this->productId;
     }
 
     /**
