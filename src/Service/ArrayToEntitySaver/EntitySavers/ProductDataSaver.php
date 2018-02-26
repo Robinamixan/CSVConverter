@@ -134,12 +134,13 @@ class ProductDataSaver implements IEntitySaver
 
     protected function isValidArray(array $item): bool
     {
+
         if (!$this->hasNeededField($item)) {
             return false;
         }
 
-        if (($item['Discontinued'] != 'yes') && (!is_null($item['Discontinued']))) {
-            if (is_null($item['Discontinued'])) {
+        if (($item['product_discontinued'] !== 'yes') && (!is_null($item['product_discontinued']))) {
+            if (is_null($item['product_discontinued'])) {
                 return false;
             }
         }
@@ -161,23 +162,27 @@ class ProductDataSaver implements IEntitySaver
 
     protected function hasNeededField(array $item): bool
     {
-        if (!array_key_exists('Product Name', $item)) {
+        if (!array_key_exists('product_name', $item)) {
             return false;
         }
 
-        if (!array_key_exists('Product Code', $item)) {
+        if (!array_key_exists('product_code', $item)) {
             return false;
         }
 
-        if (!array_key_exists('Product Description', $item)) {
+        if (!array_key_exists('product_description', $item)) {
             return false;
         }
 
-        if (!array_key_exists('Stock', $item)) {
+        if (!array_key_exists('product_stock', $item)) {
             return false;
         }
 
-        if (!array_key_exists('Cost in GBP', $item)) {
+        if (!array_key_exists('product_cost', $item)) {
+            return false;
+        }
+
+        if (!array_key_exists('product_discontinued', $item)) {
             return false;
         }
 

@@ -9,6 +9,7 @@
 namespace App\Service\FileReader\FileReaders;
 
 use App\Service\FileReader\IFileReader;
+use Symfony\Component\Yaml\Yaml;
 
 class CSVReader implements IFileReader
 {
@@ -28,27 +29,43 @@ class CSVReader implements IFileReader
     protected function convertContainToAssociativeArray(array $contain): array
     {
         if (key_exists(0, $contain)) {
-            $titles = $contain[0];
-            $titles[] = "end of string";
+            $keys = $this->convertFileTitleToArrayKeys($contain[0]);
+
             $associativeArray = [];
             for ($itemNumber = 1; $itemNumber < count($contain); $itemNumber++) {
-                for ($parameterNumber = 0; $parameterNumber < count($titles) - 1; $parameterNumber++) {
+                for ($parameterNumber = 0; $parameterNumber < count($keys); $parameterNumber++) {
                     if (key_exists($parameterNumber, $contain[$itemNumber])) {
                         if ($contain[$itemNumber][$parameterNumber] != '') {
                             $parameter = $contain[$itemNumber][$parameterNumber];
-                            $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = $parameter;
+                            $associativeArray[$itemNumber - 1][$keys[$parameterNumber]] = $parameter;
                         } else {
-                            $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = null;
+                            $associativeArray[$itemNumber - 1][$keys[$parameterNumber]] = null;
                         }
                     } else {
-                        $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = null;
+                        $associativeArray[$itemNumber - 1][$keys[$parameterNumber]] = null;
                     }
                 }
+
             }
 
             return $associativeArray;
         }
 
         return null;
+    }
+
+    protected function convertFileTitleToArrayKeys(array $fileTitles): array
+    {
+        $associateFile = __DIR__ . '/csvFile.AssociateFields.yaml';
+
+        $yaml = Yaml::parseFile($associateFile);
+
+        $keys = [];
+        foreach ($fileTitles as $fileTitle) {
+            $searchResult = array_search($fileTitle, $yaml);
+            $keys[] = $searchResult ? $searchResult : $fileTitle;
+        }
+
+        return $keys;
     }
 }

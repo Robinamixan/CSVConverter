@@ -15,15 +15,15 @@ class ProductDataToArrayConverter implements IEntityToArrayConverter
     public function convertEntityToArray(object $entity): array
     {
         $item = [];
-        $item['Product Code'] = $entity->getProductCode();
-        $item['Product Name'] = $entity->getProductName();
-        $item['Product Description'] = $entity->getProductDesc();
-        $item['Stock'] = $entity->getProductStock();
-        $item['Cost in GBP'] = $entity->getProductCost();
+        $item['product_name'] = $entity->getProductName();
+        $item['product_code'] = $entity->getProductCode();
+        $item['product_description'] = $entity->getProductDesc();
+        $item['product_stock'] = $entity->getProductStock();
+        $item['product_cost'] = $entity->getProductCost();
         if (!is_null($entity->getDiscontinuedDate())) {
-            $item['Discontinued'] = 'yes';
+            $item['product_discontinued'] = 'yes';
         } else {
-            $item['Discontinued'] = null;
+            $item['product_discontinued'] = null;
         }
 
         return $item;

@@ -10,13 +10,13 @@ class ArrayToProductDataConverter implements IArrayToEntityConverter
     public function convertArrayToEntity(array $item): ProductData
     {
         $productData = new ProductData();
-        $productData->setProductName($item['Product Name']);
-        $productData->setProductCode($item['Product Code']);
-        $productData->setProductDesc($item['Product Description']);
-        $productData->setProductStock((int)$item['Stock']);
-        $productData->setProductCost((float)$item['Cost in GBP']);
+        $productData->setProductName($item['product_name']);
+        $productData->setProductCode($item['product_code']);
+        $productData->setProductDesc($item['product_description']);
+        $productData->setProductStock((int)$item['product_stock']);
+        $productData->setProductCost((float)$item['product_cost']);
         $productData->setAddedDate(new \DateTime());
-        if ($item['Discontinued'] === 'yes') {
+        if ($item['product_discontinued'] === 'yes') {
             $productData->setDiscontinuedDate(new \DateTime());
         }
 
