@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service\Saver;
+namespace App\Service\ArrayToEntitySaver;
 
-interface iSaver
+interface IEntitySaver
 {
     public function saveArrayIntoEntity(array $contain): void;
 
