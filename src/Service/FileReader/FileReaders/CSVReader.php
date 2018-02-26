@@ -22,6 +22,33 @@ class CSVReader implements IFileReader
             fclose($handle);
         }
 
-        return $fileContain;
+        return $this->convertContainToAssociativeArray($fileContain);
+    }
+
+    protected function convertContainToAssociativeArray(array $contain): array
+    {
+        if (key_exists(0, $contain)) {
+            $titles = $contain[0];
+            $titles[] = "end of string";
+            $associativeArray = [];
+            for ($itemNumber = 1; $itemNumber < count($contain); $itemNumber++) {
+                for ($parameterNumber = 0; $parameterNumber < count($titles) - 1; $parameterNumber++) {
+                    if (key_exists($parameterNumber, $contain[$itemNumber])) {
+                        if ($contain[$itemNumber][$parameterNumber] != '') {
+                            $parameter = $contain[$itemNumber][$parameterNumber];
+                            $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = $parameter;
+                        } else {
+                            $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = null;
+                        }
+                    } else {
+                        $associativeArray[$itemNumber - 1][$titles[$parameterNumber]] = null;
+                    }
+                }
+            }
+
+            return $associativeArray;
+        }
+
+        return null;
     }
 }

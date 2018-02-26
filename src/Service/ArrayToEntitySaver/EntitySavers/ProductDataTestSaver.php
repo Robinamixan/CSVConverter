@@ -30,7 +30,6 @@ class ProductDataTestSaver extends ProductDataSaver
 
     public function saveArrayIntoEntity(array $contain): void
     {
-        $contain = $this->convertContainToAssociativeArray($contain);
         $this->checkContain($contain);
     }
 

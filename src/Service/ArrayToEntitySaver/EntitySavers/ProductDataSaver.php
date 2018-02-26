@@ -40,7 +40,6 @@ class ProductDataSaver implements IEntitySaver
 
     public function saveArrayIntoEntity(array $contain): void
     {
-        $contain = $this->convertContainToAssociativeArray($contain);
         $this->checkContain($contain);
         $this->insertIntoBD();
     }
@@ -63,33 +62,6 @@ class ProductDataSaver implements IEntitySaver
     public function getAmountProcessedRecords(): int
     {
         return $this->amountProcessedRecords;
-    }
-
-    protected function convertContainToAssociativeArray(array $contain): array
-    {
-        if (key_exists(0, $contain)) {
-            $titles = $contain[0];
-            $titles[] = "end of string";
-            $associativeArray = [];
-            for ($itemNumber = 1; $itemNumber < count($contain); $itemNumber++) {
-                for ($parameterNumber = 0; $parameterNumber < count($titles) - 1; $parameterNumber++) {
-                    if (key_exists($parameterNumber, $contain[$itemNumber])) {
-                        if ($contain[$itemNumber][$parameterNumber] != '') {
-                            $parameter = $contain[$itemNumber][$parameterNumber];
-                            $associativeArray[$itemNumber][$titles[$parameterNumber]] = $parameter;
-                        } else {
-                            $associativeArray[$itemNumber][$titles[$parameterNumber]] = null;
-                        }
-                    } else {
-                        $associativeArray[$itemNumber][$titles[$parameterNumber]] = null;
-                    }
-                }
-            }
-
-            return $associativeArray;
-        }
-
-        return null;
     }
 
     protected function checkContain(array $contain): void

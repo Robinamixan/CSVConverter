@@ -23,7 +23,7 @@ class ReaderTest extends TestCase
 
         $testFile = new \SplFileObject($testFilePath, 'r');
 
-        $testContain1 = [['a', 'b', 'c'], ['d', 'e', 'f']];
+        $testContain1 = [0 => ['a' => 'd', 'b' => 'e', 'c' => 'f']];
         $testContain2 = $reader->loadFileToArray($testFile);
 
         unlink($testFilePath);
