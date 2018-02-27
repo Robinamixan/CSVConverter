@@ -26,6 +26,7 @@ class StreamFileReaderToBD implements IControllerReading
     protected $flagTestMode;
     protected $itemsBuffer;
     protected $fileReadingReport;
+    protected const BUFFER_SIZE = 5;
 
     public function __construct(
         FileReader $fileReader,
@@ -103,7 +104,7 @@ class StreamFileReaderToBD implements IControllerReading
     {
         $this->itemsBuffer[] = $item;
 
-        if (count($this->itemsBuffer) === 5) {
+        if (count($this->itemsBuffer) === $this::BUFFER_SIZE) {
             $this->saveBufferInBD($productSaver);
             $this->itemsBuffer = [];
         }

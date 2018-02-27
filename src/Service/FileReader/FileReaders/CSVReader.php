@@ -33,16 +33,15 @@ class CSVReader implements IFileReader
     {
         if (!is_null($this->keys)) {
             $associativeArray = [];
-            for ($parameterNumber = 0; $parameterNumber < count($this->keys); $parameterNumber++) {
-                if (key_exists($parameterNumber, $indexArray)) {
-                    if ($indexArray[$parameterNumber] != '') {
-                        $parameterValue = $indexArray[$parameterNumber];
-                        $associativeArray[$this->keys[$parameterNumber]] = $parameterValue;
+            foreach ($this->keys as $keyIndex => $keyValue) {
+                if (key_exists($keyIndex, $indexArray)) {
+                    if ($indexArray[$keyIndex] !== '') {
+                        $associativeArray[$keyValue] = $indexArray[$keyIndex];
                     } else {
-                        $associativeArray[$this->keys[$parameterNumber]] = null;
+                        $associativeArray[$keyValue] = null;
                     }
                 } else {
-                    $associativeArray[$this->keys[$parameterNumber]] = null;
+                    $associativeArray[$keyValue] = null;
                 }
             }
 

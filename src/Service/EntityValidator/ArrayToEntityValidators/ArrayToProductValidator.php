@@ -19,11 +19,7 @@ class ArrayToProductValidator implements IArrayToEntityValidator
 
     public function isValidItemToEntityRules(array $item): bool
     {
-        if ($this->isValidItem($item)) {
-            return true;
-        }
-
-        return false;
+        return $this->isValidItem($item);
     }
 
     protected function isValidItem(array $item): bool

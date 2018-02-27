@@ -80,8 +80,8 @@ class ProductSaver implements IEntitySaver
 
     protected function insertIntoBD(): void
     {
-        for ($recordNumber = 0; $recordNumber < count($this->validRecords); $recordNumber++) {
-            $this->entityManager->persist($this->validRecords[$recordNumber]);
+        foreach ($this->validRecords as $validRecord) {
+            $this->entityManager->persist($validRecord);
         }
 
         try {
@@ -89,13 +89,13 @@ class ProductSaver implements IEntitySaver
         } catch (\Doctrine\DBAL\DBALException $e) {
             $this->reOpenEntityManager();
 
-            for ($recordNumber = 0; $recordNumber < count($this->validRecords); $recordNumber++) {
-                if ($this->isInBD($this->validRecords[$recordNumber])) {
-                    $this->entityManager->detach($this->validRecords[$recordNumber]);
-                    $this->addFailedRecord($this->validRecords[$recordNumber]);
+            foreach ($this->validRecords as $validRecord) {
+                if ($this->isInBD($validRecord)) {
+                    $this->entityManager->detach($validRecord);
+                    $this->addFailedRecord($validRecord);
                     $this->amountSuccessfulInserts--;
                 } else {
-                    $this->entityManager->persist($this->validRecords[$recordNumber]);
+                    $this->entityManager->persist($validRecord);
                 }
             }
             $this->entityManager->flush();
@@ -116,7 +116,7 @@ class ProductSaver implements IEntitySaver
     {
         $errors = $this->validator->validate($record);
 
-        return empty(count($errors));
+        return count($errors) === 0;
     }
 
     protected function removeRepeatedRecordsByCode(): void

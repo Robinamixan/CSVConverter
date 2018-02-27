@@ -60,7 +60,7 @@ class MainController extends Controller
         $templateArgs['form'] = $form->createView();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $controllerReading = new StreamFileReaderToBD(
+            $streamFileReader = new StreamFileReaderToBD(
                 $fileReader,
                 $arrayToEntitySaver,
                 $entityManager,
@@ -70,7 +70,7 @@ class MainController extends Controller
                 $loadingFile->getFlagTestMode()
             );
 
-            $readingReport = $fileReaderToBD->readFileToBD($loadingFile->getFile(), $controllerReading);
+            $readingReport = $fileReaderToBD->readFileToBD($loadingFile->getFile(), $streamFileReader);
 
             $templateArgs = array_merge($templateArgs, $readingReport);
         }
