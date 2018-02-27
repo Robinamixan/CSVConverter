@@ -5,12 +5,9 @@ namespace App\Controller;
 use App\Entity\File;
 use App\Form\FilesLoadForm;
 use App\Service\EntityConverter\EntityConverter;
-use App\Service\EntityValidator\ArrayToEntityValidators\ArrayToProductValidator;
 use App\Service\EntityValidator\EntityValidator;
 use App\Service\FileReader\FileReader;
 use App\Service\ArrayToEntitySaver\ArrayToEntitySaver;
-use App\Service\ArrayToEntitySaver\EntitySavers\ProductSaver;
-use App\Service\ArrayToEntitySaver\EntitySavers\ProductTestSaver;
 use App\Service\FileReaderToBD\ControllersReading\StreamFileReaderToBD;
 use App\Service\FileReaderToBD\FileReaderToBD;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,13 +65,13 @@ class MainController extends Controller
             $file = $loadingFile->getFile();
 
             $controllerReading = new StreamFileReaderToBD(
-              $fileReader,
-              $arrayToEntitySaver,
-              $entityManager,
-              $entityConverter,
-              $entityValidator,
-              $validator,
-              $loadingFile->getFlagTestMode()
+                $fileReader,
+                $arrayToEntitySaver,
+                $entityManager,
+                $entityConverter,
+                $entityValidator,
+                $validator,
+                $loadingFile->getFlagTestMode()
             );
 
             $readingReport = $fileReaderToBD->readFileToBD($file, $controllerReading);
@@ -86,6 +83,8 @@ class MainController extends Controller
         }
 
         return $this->render(
-            'FileParser/main.html.twig', $templateArgs);
+            'FileParser/main.html.twig',
+            $templateArgs
+        );
     }
 }

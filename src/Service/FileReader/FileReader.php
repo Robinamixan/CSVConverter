@@ -19,6 +19,7 @@ class FileReader
         if (is_null($this->fileReader)) {
             return false;
         }
+
         return true;
     }
 
@@ -27,6 +28,7 @@ class FileReader
         if (is_null($this->fileReader)) {
             return null;
         }
+
         return $this->fileReader->getNextItem();
     }
 

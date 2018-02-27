@@ -8,7 +8,6 @@
 
 namespace App\Service\FileReaderToBD\ControllersReading;
 
-
 use App\Service\ArrayToEntitySaver\ArrayToEntitySaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductSaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductTestSaver;
@@ -97,7 +96,7 @@ class StreamFileReaderToBD implements IControllerReading
      * @param $fileReadingReport
      * @return mixed
      */
-    public function saveBufferInBD($itemsBuffer, $productSaver, $fileReadingReport)
+    public function saveBufferInBD($itemsBuffer, $productSaver, $fileReadingReport): array
     {
         $this->arrayToEntitySaver->saveItemsArrayIntoEntity($itemsBuffer, $productSaver);
 

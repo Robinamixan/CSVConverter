@@ -81,7 +81,6 @@ class ProductSaver implements IEntitySaver
 
     protected function insertIntoBD(): void
     {
-
         for ($recordNumber = 0; $recordNumber < count($this->validRecords); $recordNumber++) {
             $this->entityManager->persist($this->validRecords[$recordNumber]);
         }
@@ -102,7 +101,6 @@ class ProductSaver implements IEntitySaver
             }
             $this->entityManager->flush();
         }
-
     }
 
     protected function reOpenEntityManager(): void
@@ -141,7 +139,7 @@ class ProductSaver implements IEntitySaver
         }
     }
 
-    protected function addFailedRecord(Product $record)
+    protected function addFailedRecord(Product $record): void
     {
         $this->failedRecords[] = $this->entityConverter->convertEntityToArray(
             $record,

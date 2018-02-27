@@ -8,7 +8,6 @@
 
 namespace App\Service\EntityValidator\ArrayToEntityValidators;
 
-
 use App\Entity\Product;
 use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
@@ -41,7 +40,7 @@ class ArrayToProductValidator implements IArrayToEntityValidator
             return false;
         }
 
-        if(!$this->hasNotEmptyFields($item)) {
+        if (!$this->hasNotEmptyFields($item)) {
 
             return false;
         }
@@ -94,9 +93,10 @@ class ArrayToProductValidator implements IArrayToEntityValidator
             return false;
         }
 
-        if ((floatval($item['product_cost']) === (float) 0) || (empty($item['product_cost']))) {
+        if ((floatval($item['product_cost']) === (float)0) || (empty($item['product_cost']))) {
             return false;
         }
+
         return true;
     }
 }
