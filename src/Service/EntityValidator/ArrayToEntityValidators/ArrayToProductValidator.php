@@ -29,7 +29,6 @@ class ArrayToProductValidator implements IArrayToEntityValidator
     public function isValidItemToEntityRules(array $item): bool
     {
         if ($this->isValidItem($item)) {
-
             return true;
         }
 
@@ -43,6 +42,7 @@ class ArrayToProductValidator implements IArrayToEntityValidator
         }
 
         if(!$this->hasNotEmptyFields($item)) {
+
             return false;
         }
 
@@ -90,11 +90,11 @@ class ArrayToProductValidator implements IArrayToEntityValidator
             return false;
         }
 
-        if ((intval($item['product_stock']) === 0) || (is_null($item['product_stock']))) {
+        if ((intval($item['product_stock']) === 0) || (empty($item['product_stock']))) {
             return false;
         }
 
-        if ((floatval($item['product_cost']) === 0) || (is_null($item['product_cost']))) {
+        if ((floatval($item['product_cost']) === (float)0) || (empty($item['product_cost']))) {
             return false;
         }
         return true;

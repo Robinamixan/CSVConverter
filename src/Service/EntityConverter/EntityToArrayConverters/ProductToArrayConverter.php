@@ -15,8 +15,8 @@ class ProductToArrayConverter implements IEntityToArrayConverter
     public function convertEntityToArray(object $entity): array
     {
         $item = [];
-        $item['product_name'] = $entity->getProductName();
         $item['product_code'] = $entity->getProductCode();
+        $item['product_name'] = $entity->getProductName();
         $item['product_description'] = $entity->getProductDesc();
         $item['product_stock'] = $entity->getProductStock();
         $item['product_cost'] = $entity->getProductCost();

@@ -76,6 +76,7 @@ class ProductSaver implements IEntitySaver
                 $this->failedRecords[] = $item;
             }
         }
+        $this->removeRepeatedRecordsByCode();
     }
 
     protected function insertIntoBD(): void
@@ -91,23 +92,17 @@ class ProductSaver implements IEntitySaver
             $this->reOpenEntityManager();
 
             for ($recordNumber = 0; $recordNumber < count($this->validRecords); $recordNumber++) {
-
                 if ($this->isInBD($this->validRecords[$recordNumber])) {
-                    //$this->entityManager->detach($this->validRecords[$recordNumber]);
-
-                    $this->failedRecords[] = $this->entityConverter->convertEntityToArray(
-                        $this->validRecords[$recordNumber],
-                        new ProductToArrayConverter()
-                    );
-
+                    $this->entityManager->detach($this->validRecords[$recordNumber]);
+                    $this->addFailedRecord($this->validRecords[$recordNumber]);
                     $this->amountSuccessfulInserts--;
-                    $this->amountFailedInserts++;
                 } else {
                     $this->entityManager->persist($this->validRecords[$recordNumber]);
                 }
             }
             $this->entityManager->flush();
         }
+
     }
 
     protected function reOpenEntityManager(): void
@@ -125,6 +120,34 @@ class ProductSaver implements IEntitySaver
         $errors = $this->validator->validate($record);
 
         return empty(count($errors));
+    }
+
+    protected function removeRepeatedRecordsByCode(): void
+    {
+        $productCodesColumn = [];
+        foreach ($this->validRecords as $record) {
+            $productCodesColumn[] = $record->getProductCode();
+        }
+        $uniqueProductCodesColumn = array_unique($productCodesColumn);
+
+        foreach ($this->validRecords as $key => $record) {
+            if (!array_key_exists($key, $uniqueProductCodesColumn)) {
+                $this->addFailedRecord($record);
+                $this->amountSuccessfulInserts--;
+
+                unset($this->validRecords[$key]);
+                sort($this->validRecords);
+            }
+        }
+    }
+
+    protected function addFailedRecord(Product $record)
+    {
+        $this->failedRecords[] = $this->entityConverter->convertEntityToArray(
+            $record,
+            new ProductToArrayConverter()
+        );
+        $this->amountFailedInserts++;
     }
 
     protected function isInBD(Product $item): bool
