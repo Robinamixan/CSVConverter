@@ -58,9 +58,7 @@ class Product
      *     options={"unsigned"=true}
      *     )
      * @Assert\NotBlank()
-     * @Assert\Range(
-     *      max=1000
-     * )
+     * @Assert\Range(max=1000)
      */
     private $productCost;
 
@@ -99,7 +97,7 @@ class Product
     /**
      * @param string $productName
      */
-    public function setProductName(?string $productName): void
+    public function setProductName(string $productName): void
     {
         $this->productName = $productName;
     }
@@ -115,7 +113,7 @@ class Product
     /**
      * @param string $productDesc
      */
-    public function setProductDesc(?string $productDesc): void
+    public function setProductDesc(string $productDesc): void
     {
         $this->productDesc = $productDesc;
     }
@@ -131,7 +129,7 @@ class Product
     /**
      * @param string $productCode
      */
-    public function setProductCode(?string $productCode): void
+    public function setProductCode(string $productCode): void
     {
         $this->productCode = $productCode;
     }
@@ -147,7 +145,7 @@ class Product
     /**
      * @param \DateTime $addedDate
      */
-    public function setAddedDate(?\DateTime $addedDate): void
+    public function setAddedDate(\DateTime $addedDate): void
     {
         $this->addedDate = $addedDate;
     }
@@ -163,7 +161,7 @@ class Product
     /**
      * @param \DateTime $discontinuedDate
      */
-    public function setDiscontinuedDate(?\DateTime $discontinuedDate): void
+    public function setDiscontinuedDate(\DateTime $discontinuedDate): void
     {
         $this->discontinuedDate = $discontinuedDate;
     }
@@ -179,7 +177,7 @@ class Product
     /**
      * @param \DateTime $timestamp
      */
-    public function setTimestamp(?\DateTime $timestamp): void
+    public function setTimestamp(\DateTime $timestamp): void
     {
         $this->timestamp = $timestamp;
     }
@@ -195,7 +193,7 @@ class Product
     /**
      * @param int $productStock
      */
-    public function setProductStock(?int $productStock): void
+    public function setProductStock(int $productStock): void
     {
         $this->productStock = $productStock;
     }
@@ -211,7 +209,7 @@ class Product
     /**
      * @param float $productCost
      */
-    public function setProductCost(?float $productCost): void
+    public function setProductCost(float $productCost): void
     {
         $this->productCost = $productCost;
     }

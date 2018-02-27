@@ -2,10 +2,7 @@
 
 namespace App\Service\ArrayToEntitySaver\EntitySavers;
 
-use App\Entity\Product;
-use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
-use App\Service\EntityConverter\EntityToArrayConverters\ProductToArrayConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -26,19 +23,16 @@ class ProductTestSaver extends ProductSaver
         $this->amountFailedInserts = 0;
         $this->amountSuccessfulInserts = 0;
         $this->checkValidRecordsFromItems($items);
+        $this->removeRepeatedRecordsByCode();
         $this->checkIsValidRecordsInBD();
     }
 
-    protected function checkIsValidRecordsInBD()
+    protected function checkIsValidRecordsInBD(): void
     {
         foreach ($this->validRecords as $validRecord) {
             if ($this->isInBD($validRecord)) {
-                $this->failedRecords[] = $this->entityConverter->convertEntityToArray(
-                    $validRecord,
-                    new ProductToArrayConverter()
-                );
+                $this->addFailedRecord($validRecord);
                 $this->amountSuccessfulInserts--;
-                $this->amountFailedInserts++;
             }
         }
     }

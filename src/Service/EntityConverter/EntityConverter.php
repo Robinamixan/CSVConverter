@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 21.2.18
- * Time: 9.45
- */
 
 namespace App\Service\EntityConverter;
 
@@ -17,10 +11,7 @@ class EntityConverter
         return $arrayToEntityConverter->convertArrayToEntity($item);
     }
 
-    public function convertEntityToArray(
-        Product $productData,
-        IEntityToArrayConverter $entityToArrayConverter
-    ): array {
+    public function convertEntityToArray(Product $productData, IEntityToArrayConverter $entityToArrayConverter): array {
         return $entityToArrayConverter->convertEntityToArray($productData);
     }
 }

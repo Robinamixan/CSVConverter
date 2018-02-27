@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 21.2.18
- * Time: 10.06
- */
 
 namespace App\Service\EntityConverter\EntityToArrayConverters;
 

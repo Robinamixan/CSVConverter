@@ -43,6 +43,7 @@ class ProductSaver implements IEntitySaver
         $this->amountFailedInserts = 0;
         $this->amountSuccessfulInserts = 0;
         $this->checkValidRecordsFromItems($items);
+        $this->removeRepeatedRecordsByCode();
         $this->insertIntoBD();
     }
 
@@ -72,11 +73,9 @@ class ProductSaver implements IEntitySaver
                 $this->amountSuccessfulInserts++;
                 $this->validRecords[] = $record;
             } else {
-                $this->amountFailedInserts++;
-                $this->failedRecords[] = $item;
+                $this->addFailedRecord($record);
             }
         }
-        $this->removeRepeatedRecordsByCode();
     }
 
     protected function insertIntoBD(): void

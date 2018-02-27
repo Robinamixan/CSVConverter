@@ -57,13 +57,9 @@ class MainController extends Controller
 
         $form = $this->createForm(FilesLoadForm::class, $loadingFile);
         $form->handleRequest($request);
-
         $templateArgs['form'] = $form->createView();
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $file = $loadingFile->getFile();
-
             $controllerReading = new StreamFileReaderToBD(
                 $fileReader,
                 $arrayToEntitySaver,
@@ -74,17 +70,11 @@ class MainController extends Controller
                 $loadingFile->getFlagTestMode()
             );
 
-            $readingReport = $fileReaderToBD->readFileToBD($file, $controllerReading);
+            $readingReport = $fileReaderToBD->readFileToBD($loadingFile->getFile(), $controllerReading);
 
-            $templateArgs = array_merge(
-                $templateArgs,
-                $readingReport
-            );
+            $templateArgs = array_merge($templateArgs, $readingReport);
         }
 
-        return $this->render(
-            'FileParser/main.html.twig',
-            $templateArgs
-        );
+        return $this->render('FileParser/main.html.twig', $templateArgs);
     }
 }

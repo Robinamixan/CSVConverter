@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 26.2.18
- * Time: 13.51
- */
 
 namespace App\Service\EntityValidator\ArrayToEntityValidators;
 
-use App\Entity\Product;
-use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
 use App\Service\EntityValidator\IArrayToEntityValidator;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

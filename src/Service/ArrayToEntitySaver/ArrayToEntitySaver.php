@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f.gorodkovets
- * Date: 13.2.18
- * Time: 18.32
- */
 
 namespace App\Service\ArrayToEntitySaver;
 
