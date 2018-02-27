@@ -17,10 +17,10 @@ class ArrayToEntitySaver
         $this->entitySaver = null;
     }
 
-    public function saveArrayIntoEntity(array $items, IEntitySaver $entitySaver): void
+    public function saveItemsArrayIntoEntity(array $items, IEntitySaver $entitySaver): void
     {
         $this->entitySaver = $entitySaver;
-        $this->entitySaver->saveArrayIntoEntity($items);
+        $this->entitySaver->saveItemsArrayIntoEntity($items);
     }
 
     public function getFailedRecords(): array

@@ -19,7 +19,7 @@ class ProductTestSaver extends ProductSaver
         parent::__construct($entityManager, $entityConverter, $validator);
     }
 
-    public function saveArrayIntoEntity(array $items): void
+    public function saveItemsArrayIntoEntity(array $items): void
     {
         $this->validRecords = [];
         $this->failedRecords = [];

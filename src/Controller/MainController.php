@@ -11,6 +11,8 @@ use App\Service\FileReader\FileReader;
 use App\Service\ArrayToEntitySaver\ArrayToEntitySaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductSaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductTestSaver;
+use App\Service\FileReaderToBD\ControllersReading\StreamFileReaderToBD;
+use App\Service\FileReaderToBD\FileReaderToBD;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +34,7 @@ class MainController extends Controller
      * @param EntityConverter $entityConverter
      * @param EntityValidator $entityValidator
      * @param ValidatorInterface $validator
+     * @param FileReaderToBD $fileReaderToBD
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function fileLoadAction(
@@ -41,7 +44,8 @@ class MainController extends Controller
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
         EntityValidator $entityValidator,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        FileReaderToBD $fileReaderToBD
     ) {
         $loadingFile = new File();
 
@@ -49,9 +53,9 @@ class MainController extends Controller
             'form' => null,
             'loadReport' => null,
             'failedRecords' => [],
-            'amountFailed' => 0,
-            'amountProcessed' => 0,
-            'amountSuccesses' => 0,
+            'amountFailedItems' => 0,
+            'amountProcessedItems' => 0,
+            'amountSuccessesItems' => 0,
         ];
 
         $form = $this->createForm(FilesLoadForm::class, $loadingFile);
@@ -62,46 +66,23 @@ class MainController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
 
             $file = $loadingFile->getFile();
-            $productSaver = !$loadingFile->getFlagTestMode()
-                ? new ProductSaver($entityManager, $entityConverter, $validator)
-                : new ProductTestSaver($entityManager, $entityConverter, $validator);
-            $productValidator = new ArrayToProductValidator($entityConverter, $validator);
 
+            $controllerReading = new StreamFileReaderToBD(
+              $fileReader,
+              $arrayToEntitySaver,
+              $entityManager,
+              $entityConverter,
+              $entityValidator,
+              $validator,
+              $loadingFile->getFlagTestMode()
+            );
 
-            $fileReader->setFileForRead($file);
-            while ($item = $fileReader->getNextItem()) {
-                $templateArgs['amountProcessed']++;
+            $readingReport = $fileReaderToBD->readFileToBD($file, $controllerReading);
 
-                if ($entityValidator->isValidItemToEntityRules($item, $productValidator)){
-                    $itemsBuffer[] = $item;
-
-                    if (count($itemsBuffer) === 5) {
-                        $arrayToEntitySaver->saveArrayIntoEntity($itemsBuffer, $productSaver);
-
-                        $templateArgs['failedRecords'] = array_merge(
-                            $templateArgs['failedRecords'],
-                            $arrayToEntitySaver->getFailedRecords()
-                        );
-
-                        $templateArgs['amountFailed'] += $arrayToEntitySaver->getAmountFailedInserts();
-                        $templateArgs['amountSuccesses'] += $arrayToEntitySaver->getAmountSuccessfulInserts();
-                        $itemsBuffer = [];
-                    }
-                } else {
-                    $templateArgs['failedRecords'][] = $item;
-                    $templateArgs['amountFailed']++;
-                }
-            }
-
-            if (!empty($itemsBuffer)) {
-                $arrayToEntitySaver->saveArrayIntoEntity($itemsBuffer, $productSaver);
-                $templateArgs['failedRecords'] = array_merge(
-                    $templateArgs['failedRecords'],
-                    $arrayToEntitySaver->getFailedRecords()
-                );
-                $templateArgs['amountFailed'] += $arrayToEntitySaver->getAmountFailedInserts();
-                $templateArgs['amountSuccesses'] += $arrayToEntitySaver->getAmountSuccessfulInserts();
-            }
+            $templateArgs = array_merge(
+                $templateArgs,
+                $readingReport
+            );
         }
 
         return $this->render(

@@ -36,7 +36,7 @@ class ProductSaver implements IEntitySaver
         $this->validator = $validator;
     }
 
-    public function saveArrayIntoEntity(array $items): void
+    public function saveItemsArrayIntoEntity(array $items): void
     {
         $this->validRecords = [];
         $this->failedRecords = [];

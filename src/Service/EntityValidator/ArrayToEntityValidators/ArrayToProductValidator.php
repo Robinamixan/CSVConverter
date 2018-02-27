@@ -94,7 +94,7 @@ class ArrayToProductValidator implements IArrayToEntityValidator
             return false;
         }
 
-        if ((floatval($item['product_cost']) === (float)0) || (empty($item['product_cost']))) {
+        if ((floatval($item['product_cost']) === (float) 0) || (empty($item['product_cost']))) {
             return false;
         }
         return true;

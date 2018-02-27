@@ -4,7 +4,7 @@ namespace App\Service\ArrayToEntitySaver;
 
 interface IEntitySaver
 {
-    public function saveArrayIntoEntity(array $items): void;
+    public function saveItemsArrayIntoEntity(array $items): void;
 
     public function getFailedRecords(): array;
 
