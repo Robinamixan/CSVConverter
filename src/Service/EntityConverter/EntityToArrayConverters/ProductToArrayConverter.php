@@ -19,6 +19,7 @@ class ProductToArrayConverter implements IEntityToArrayConverter
         } else {
             $item['product_discontinued'] = null;
         }
+        $entity = null;
 
         return $item;
     }

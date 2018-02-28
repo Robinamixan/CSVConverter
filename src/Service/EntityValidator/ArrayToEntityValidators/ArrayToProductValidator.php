@@ -9,12 +9,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ArrayToProductValidator implements IArrayToEntityValidator
 {
     private $entityConverter;
-    private $validator;
 
-    public function __construct(EntityConverter $entityConverter, ValidatorInterface $validator)
+    public function __construct(EntityConverter $entityConverter)
     {
         $this->entityConverter = $entityConverter;
-        $this->validator = $validator;
     }
 
     public function isValidItemToEntityRules(array $item): bool

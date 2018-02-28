@@ -37,8 +37,7 @@ class AppReadCSVFileCommand extends Command
         EntityValidator $entityValidator,
         ValidatorInterface $validator,
         FileReaderToBD $fileReaderToBD
-    )
-    {
+    ) {
         parent::__construct($name);
         $this->validator = $validator;
         $this->entityConverter = $entityConverter;
@@ -54,8 +53,7 @@ class AppReadCSVFileCommand extends Command
         $this
             ->setDescription('Add a short description for your command')
             ->addArgument('arg1', InputArgument::REQUIRED, 'Argument description')
-            ->addOption('test', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addOption('test', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -104,17 +102,16 @@ class AppReadCSVFileCommand extends Command
             $io->note(sprintf('Success Items: %s', $templateArgs['amountSuccessesItems']));
 
             $io->note(sprintf('Time processed: %s', $time));
-            $io->note(sprintf('Get memory: %s', (int)(memory_get_usage() / 1024) . ' KB'));
+            $io->note(sprintf('Get memory: %s', (int)(memory_get_peak_usage() / 1024).' KB'));
 
             $fileName = 'files/logFailureItems.csv';
-            unlink($fileName);
+//            unlink($fileName);
         }
-
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
     }
 
     public function getCurrentMemorySize()
     {
-        return (int)(memory_get_usage() / 1024) . ' KB';
+        return (int)(memory_get_usage() / 1024).' KB';
     }
 }

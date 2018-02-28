@@ -11,7 +11,8 @@ class EntityConverter
         return $arrayToEntityConverter->convertArrayToEntity($item);
     }
 
-    public function convertEntityToArray(Product $productData, IEntityToArrayConverter $entityToArrayConverter): array {
+    public function convertEntityToArray(Product $productData, IEntityToArrayConverter $entityToArrayConverter): array
+    {
         return $entityToArrayConverter->convertEntityToArray($productData);
     }
 }

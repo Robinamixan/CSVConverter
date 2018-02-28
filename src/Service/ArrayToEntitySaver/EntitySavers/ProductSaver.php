@@ -11,13 +11,13 @@ use App\Service\EntityConverter\IArrayToEntityConverter;
 use App\Service\EntityConverter\IEntityToArrayConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class ProductSaver implements IEntitySaver
 {
     protected $entityManager;
     protected $entityRepository;
     protected $entityConverter;
-    protected $validator;
     protected $arrayToProductConverter;
     protected $productToArrayConverter;
     protected $failedRecords;
@@ -28,7 +28,6 @@ class ProductSaver implements IEntitySaver
     public function __construct(
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
-        ValidatorInterface $validator,
         IEntityToArrayConverter $productToArrayConverter,
         IArrayToEntityConverter $arrayToProductConverter
     ) {
@@ -39,7 +38,6 @@ class ProductSaver implements IEntitySaver
         $this->entityManager = $entityManager;
         $this->entityRepository = $this->entityManager->getRepository(Product::class);
         $this->entityConverter = $entityConverter;
-        $this->validator = $validator;
         $this->arrayToProductConverter = $arrayToProductConverter;
         $this->productToArrayConverter = $productToArrayConverter;
     }
@@ -53,55 +51,70 @@ class ProductSaver implements IEntitySaver
         $this->checkValidRecordsFromItems($items);
         $this->removeRepeatedRecordsByCode();
         $this->insertIntoBD();
-        unset($items);
+        $items = null;
     }
 
     public function getFailedRecords(): array
     {
-        return $this->failedRecords;
+        $failedRecords = $this->failedRecords;
+        $this->failedRecords = null;
+
+        return $failedRecords;
     }
 
     public function getAmountFailedInserts(): int
     {
-        return $this->amountFailedInserts;
+        $amountFailedInserts = $this->amountFailedInserts;
+        $this->amountFailedInserts = null;
+
+        return $amountFailedInserts;
     }
 
     public function getAmountSuccessfulInserts(): int
     {
-        return $this->amountSuccessfulInserts;
+        $amountSuccessfulInserts = $this->amountSuccessfulInserts;
+        $this->amountSuccessfulInserts = null;
+
+        return $amountSuccessfulInserts;
     }
 
     protected function checkValidRecordsFromItems(array $items): void
     {
+        $validatorBuild = new ValidatorBuilder();
+        $validator = $validatorBuild
+            ->enableAnnotationMapping()
+            ->getValidator();
+
         foreach ($items as $item) {
             $record = $this->entityConverter->convertArrayToEntity(
                 $item,
                 $this->arrayToProductConverter
             );
-            if ($this->isValidRecord($record)) {
+            if ($this->isValidRecord($record, $validator)) {
                 $this->amountSuccessfulInserts++;
                 $this->validRecords[] = $record;
             } else {
                 $this->addFailedRecord($record);
             }
-            unset($item);
+            $record = null;
+            $item = null;
         }
+        $items = null;
+        $validator = null;
     }
 
     protected function insertIntoBD(): void
     {
         foreach ($this->validRecords as $validRecord) {
-
             $this->entityManager->persist($validRecord);
         }
 
         try {
             $this->entityManager->flush();
             $this->entityManager->clear();
-        }
-        catch (\Doctrine\DBAL\DBALException $e) {
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            $e = null;
             $this->reOpenEntityManager();
-
             foreach ($this->validRecords as $validRecord) {
                 if ($this->isInBD($validRecord)) {
                     $this->entityManager->detach($validRecord);
@@ -110,11 +123,12 @@ class ProductSaver implements IEntitySaver
                 } else {
                     $this->entityManager->persist($validRecord);
                 }
-                unset($validRecord);
+                $validRecord = null;
             }
             $this->entityManager->flush();
             $this->entityManager->clear();
         }
+        $this->validRecords = null;
     }
 
     protected function reOpenEntityManager(): void
@@ -128,10 +142,12 @@ class ProductSaver implements IEntitySaver
         }
     }
 
-    protected function isValidRecord(Product $record): bool
+    protected function isValidRecord(Product $record, ValidatorInterface $validator): bool
     {
-        $errors = $this->validator->validate($record);
-        unset($record);
+        $errors = $validator->validate($record);
+        $validatorBuild = null;
+        $record = null;
+
         return count($errors) === 0;
     }
 
@@ -140,7 +156,7 @@ class ProductSaver implements IEntitySaver
         $productCodesColumn = [];
         foreach ($this->validRecords as $record) {
             $productCodesColumn[] = $record->getProductCode();
-            unset($record);
+            $record = null;
         }
         $uniqueProductCodesColumn = array_unique($productCodesColumn);
 
@@ -149,10 +165,11 @@ class ProductSaver implements IEntitySaver
                 $this->addFailedRecord($record);
                 $this->amountSuccessfulInserts--;
 
-                unset($this->validRecords[$key]);
+                $this->validRecords[$key] = null;
                 sort($this->validRecords);
             }
-            unset($key, $record);
+            $key = null;
+            $record = null;
         }
     }
 
@@ -163,13 +180,19 @@ class ProductSaver implements IEntitySaver
             $this->productToArrayConverter
         );
         $this->amountFailedInserts++;
-        unset($record);
+        $record = null;
     }
 
     protected function isInBD(Product $item): bool
     {
         $productCode = $item->getProductCode();
-        unset($item);
+        $item = null;
+
         return $this->entityRepository->productCodeExists($productCode);
+    }
+
+    public function getCurrentMemorySize()
+    {
+        return (int)(memory_get_usage() / 1024).' KB';
     }
 }
