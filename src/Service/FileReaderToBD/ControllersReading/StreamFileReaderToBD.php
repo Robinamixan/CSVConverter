@@ -6,7 +6,9 @@ use App\Service\ArrayToEntitySaver\ArrayToEntitySaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductSaver;
 use App\Service\ArrayToEntitySaver\EntitySavers\ProductTestSaver;
 use App\Service\ArrayToEntitySaver\IEntitySaver;
+use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
+use App\Service\EntityConverter\EntityToArrayConverters\ProductToArrayConverter;
 use App\Service\EntityValidator\ArrayToEntityValidators\ArrayToProductValidator;
 use App\Service\EntityValidator\EntityValidator;
 use App\Service\EntityValidator\IArrayToEntityValidator;
@@ -26,7 +28,9 @@ class StreamFileReaderToBD implements IControllerReading
     protected $flagTestMode;
     protected $itemsBuffer;
     protected $fileReadingReport;
-    protected const BUFFER_SIZE = 5;
+    protected $arrayToEntityConverter;
+    protected $entityToArrayConverter;
+    protected const BUFFER_SIZE = 1000;
 
     public function __construct(
         FileReader $fileReader,
@@ -59,13 +63,25 @@ class StreamFileReaderToBD implements IControllerReading
      */
     public function readFileToBD(\SplFileObject $file): array
     {
+        $this->arrayToEntityConverter = new ArrayToProductConverter();
+        $this->entityToArrayConverter = new ProductToArrayConverter();
+
         $productSaver = !$this->flagTestMode
-            ? new ProductSaver($this->entityManager, $this->entityConverter, $this->validator)
+            ? new ProductSaver(
+                $this->entityManager,
+                $this->entityConverter,
+                $this->validator,
+                $this->entityToArrayConverter,
+                $this->arrayToEntityConverter
+            )
             : new ProductTestSaver($this->entityManager, $this->entityConverter, $this->validator);
 
         $productValidator = new ArrayToProductValidator($this->entityConverter, $this->validator);
 
         $this->fileReader->setFileForRead($file);
+        ini_set('max_execution_time', 1000);
+
+
         while ($item = $this->fileReader->getNextItem()) {
             $this->fileReadingReport['amountProcessedItems']++;
             $this->checkIsValidItemsAndSave($item, $productValidator, $productSaver);
@@ -103,10 +119,11 @@ class StreamFileReaderToBD implements IControllerReading
     public function collectItemsAndSave(array $item, IEntitySaver $productSaver): void
     {
         $this->itemsBuffer[] = $item;
-
         if (count($this->itemsBuffer) === $this::BUFFER_SIZE) {
             $this->saveBufferInBD($productSaver);
             $this->itemsBuffer = [];
+            $this->putFailedRecordsInFile();
+
         }
     }
 
@@ -116,13 +133,32 @@ class StreamFileReaderToBD implements IControllerReading
     public function saveBufferInBD(IEntitySaver $productSaver): void
     {
         $this->arrayToEntitySaver->saveItemsArrayIntoEntity($this->itemsBuffer, $productSaver);
-
+//        echo $this->getCurrentMemorySize(), "   - before\n";
         $this->fileReadingReport['failedRecords'] = array_merge(
             $this->fileReadingReport['failedRecords'],
             $this->arrayToEntitySaver->getFailedRecords()
         );
-
+//        echo $this->getCurrentMemorySize(), "   - after\n";
         $this->fileReadingReport['amountFailedItems'] += $this->arrayToEntitySaver->getAmountFailedInserts();
         $this->fileReadingReport['amountSuccessesItems'] += $this->arrayToEntitySaver->getAmountSuccessfulInserts();
+
+    }
+    
+    protected function putFailedRecordsInFile()
+    {
+        $fileName = 'files/logFailureItems.csv';
+        $file = fopen($fileName, 'a+');
+        foreach ($this->fileReadingReport['failedRecords'] as $failedRecord) {
+            fputcsv($file, $failedRecord);
+            unset($failedRecord);
+        }
+
+        fclose($file);
+        $this->fileReadingReport['failedRecords'] = [];
+    }
+
+    public function getCurrentMemorySize()
+    {
+        return (int)(memory_get_usage() / 1024) . ' KB';
     }
 }

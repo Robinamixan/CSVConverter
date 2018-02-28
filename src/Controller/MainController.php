@@ -60,6 +60,7 @@ class MainController extends Controller
         $templateArgs['form'] = $form->createView();
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $start = microtime(true);
             $streamFileReader = new StreamFileReaderToBD(
                 $fileReader,
                 $arrayToEntitySaver,
@@ -71,6 +72,13 @@ class MainController extends Controller
             );
 
             $readingReport = $fileReaderToBD->readFileToBD($loadingFile->getFile(), $streamFileReader);
+
+            $fileName = 'files/logFailureItems.csv';
+            $time = microtime(true) - $start;
+            var_dump($time . "\n");
+            var_dump((int)(memory_get_usage() / 1024) . ' KB');
+            unlink($fileName);
+            die();
 
             $templateArgs = array_merge($templateArgs, $readingReport);
         }

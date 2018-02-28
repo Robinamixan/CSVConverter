@@ -15,12 +15,13 @@ class ProductRepository extends ServiceEntityRepository
 
     public function productCodeExists(string $code): bool
     {
-        $record = $this->createQueryBuilder('t')
+        $query = $this->createQueryBuilder('t')
             ->where('t.productCode = :value')->setParameter('value', $code)
             ->setMaxResults(1)
-            ->getQuery()
-            ->getResult();
-
-        return !empty($record);
+            ->getQuery();
+        $this->clear();
+        $result = $query->getResult();
+        unset($query);
+        return !empty($result);
     }
 }
