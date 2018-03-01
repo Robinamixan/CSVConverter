@@ -6,7 +6,7 @@ use App\Service\EntityConverter\EntityConverter;
 use App\Service\EntityConverter\IArrayToEntityConverter;
 use App\Service\EntityConverter\IEntityToArrayConverter;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class ProductTestSaver extends ProductSaver
 {
@@ -14,9 +14,16 @@ class ProductTestSaver extends ProductSaver
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
         IEntityToArrayConverter $productToArrayConverter,
-        IArrayToEntityConverter $arrayToProductConverter
+        IArrayToEntityConverter $arrayToProductConverter,
+        ValidatorBuilder $validatorBuilder
     ) {
-        parent::__construct($entityManager, $entityConverter, $productToArrayConverter, $arrayToProductConverter);
+        parent::__construct(
+            $entityManager,
+            $entityConverter,
+            $productToArrayConverter,
+            $arrayToProductConverter,
+            $validatorBuilder
+        );
     }
 
     public function saveItemsArrayIntoEntity(array $items): void

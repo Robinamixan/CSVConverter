@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class MainController extends Controller
 {
@@ -41,10 +42,10 @@ class MainController extends Controller
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
         EntityValidator $entityValidator,
-        ValidatorInterface $validator,
         FileReaderToBD $fileReaderToBD
     ) {
         $loadingFile = new File();
+        $validatorBuilder = new ValidatorBuilder();
 
         $templateArgs = [
             'form' => null,
@@ -53,6 +54,8 @@ class MainController extends Controller
             'amountFailedItems' => 0,
             'amountProcessedItems' => 0,
             'amountSuccessesItems' => 0,
+            'processingTime' => 0,
+            'amountMemory' => '',
         ];
 
         $form = $this->createForm(FilesLoadForm::class, $loadingFile);
@@ -67,18 +70,14 @@ class MainController extends Controller
                 $entityManager,
                 $entityConverter,
                 $entityValidator,
-                $validator,
+                $validatorBuilder,
                 $loadingFile->getFlagTestMode()
             );
 
             $readingReport = $fileReaderToBD->readFileToBD($loadingFile->getFile(), $streamFileReader);
 
-            $fileName = 'files/logFailureItems.csv';
-            $time = microtime(true) - $start;
-            var_dump($time . "\n");
-            var_dump((int)(memory_get_usage() / 1024) . ' KB');
-            unlink($fileName);
-            die();
+            $templateArgs['processingTime'] = microtime(true) - $start;
+            $templateArgs['amountMemory'] = (int)(memory_get_peak_usage() / 1024).' KB';
 
             $templateArgs = array_merge($templateArgs, $readingReport);
         }

@@ -3,9 +3,7 @@
 namespace App\Service\ArrayToEntitySaver\EntitySavers;
 
 use App\Entity\Product;
-use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
-use App\Service\EntityConverter\EntityToArrayConverters\ProductToArrayConverter;
 use App\Service\ArrayToEntitySaver\IEntitySaver;
 use App\Service\EntityConverter\IArrayToEntityConverter;
 use App\Service\EntityConverter\IEntityToArrayConverter;
@@ -24,12 +22,14 @@ class ProductSaver implements IEntitySaver
     protected $validRecords;
     protected $amountSuccessfulInserts;
     protected $amountFailedInserts;
+    protected $validatorBuilder;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
         IEntityToArrayConverter $productToArrayConverter,
-        IArrayToEntityConverter $arrayToProductConverter
+        IArrayToEntityConverter $arrayToProductConverter,
+        ValidatorBuilder $validatorBuilder
     ) {
         $this->validRecords = [];
         $this->failedRecords = [];
@@ -40,6 +40,7 @@ class ProductSaver implements IEntitySaver
         $this->entityConverter = $entityConverter;
         $this->arrayToProductConverter = $arrayToProductConverter;
         $this->productToArrayConverter = $productToArrayConverter;
+        $this->validatorBuilder = $validatorBuilder;
     }
 
     public function saveItemsArrayIntoEntity(array $items): void
@@ -51,7 +52,6 @@ class ProductSaver implements IEntitySaver
         $this->checkValidRecordsFromItems($items);
         $this->removeRepeatedRecordsByCode();
         $this->insertIntoBD();
-        $items = null;
     }
 
     public function getFailedRecords(): array
@@ -80,8 +80,7 @@ class ProductSaver implements IEntitySaver
 
     protected function checkValidRecordsFromItems(array $items): void
     {
-        $validatorBuild = new ValidatorBuilder();
-        $validator = $validatorBuild
+        $validator = $this->validatorBuilder
             ->enableAnnotationMapping()
             ->getValidator();
 

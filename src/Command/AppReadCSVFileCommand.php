@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class AppReadCSVFileCommand extends Command
 {
@@ -25,7 +25,7 @@ class AppReadCSVFileCommand extends Command
     protected $entityManager;
     protected $entityConverter;
     protected $entityValidator;
-    protected $validator;
+    protected $validatorBuilder;
     protected $fileReaderToBD;
 
     public function __construct(
@@ -35,30 +35,29 @@ class AppReadCSVFileCommand extends Command
         EntityManagerInterface $entityManager,
         EntityConverter $entityConverter,
         EntityValidator $entityValidator,
-        ValidatorInterface $validator,
         FileReaderToBD $fileReaderToBD
     ) {
         parent::__construct($name);
-        $this->validator = $validator;
         $this->entityConverter = $entityConverter;
         $this->entityValidator = $entityValidator;
         $this->entityManager = $entityManager;
         $this->arrayToEntitySaver = $arrayToEntitySaver;
         $this->fileReader = $fileReader;
         $this->fileReaderToBD = $fileReaderToBD;
+        $this->validatorBuilder = new ValidatorBuilder();
     }
 
     protected function configure()
     {
         $this
             ->setDescription('Add a short description for your command')
-            ->addArgument('arg1', InputArgument::REQUIRED, 'Argument description')
+            ->addArgument('filePath', InputArgument::REQUIRED, 'Path to File')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Option description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $templateArgs = [
+        $reportProcessing = [
             'failedRecords' => [],
             'amountFailedItems' => 0,
             'amountProcessedItems' => 0,
@@ -66,15 +65,14 @@ class AppReadCSVFileCommand extends Command
         ];
 
         $io = new SymfonyStyle($input, $output);
-        $filePath = $input->getArgument('arg1');
-
         $this->entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
-
         foreach ($this->entityManager->getEventManager()->getListeners() as $event => $listeners) {
             foreach ($listeners as $listener) {
                 $this->entityManager->getEventManager()->removeEventListener($event, $listener);
             }
         }
+
+        $filePath = $input->getArgument('filePath');
 
         if ($filePath) {
             $io->note(sprintf('You passed an argument: %s', $filePath));
@@ -88,30 +86,24 @@ class AppReadCSVFileCommand extends Command
                 $this->entityManager,
                 $this->entityConverter,
                 $this->entityValidator,
-                $this->validator,
+                $this->validatorBuilder,
                 $input->getOption('test')
             );
 
             $readingReport = $this->fileReaderToBD->readFileToBD($file, $streamFileReader);
-            $templateArgs = array_merge($templateArgs, $readingReport);
+            $reportProcessing = array_merge($reportProcessing, $readingReport);
 
             $time = microtime(true) - $start;
 
-            $io->note(sprintf('Processed Items: %s', $templateArgs['amountProcessedItems']));
-            $io->note(sprintf('Failure Items: %s', $templateArgs['amountFailedItems']));
-            $io->note(sprintf('Success Items: %s', $templateArgs['amountSuccessesItems']));
+            $io->note(sprintf('Processed Items: %s', $reportProcessing['amountProcessedItems']));
+            $io->note(sprintf('Failure Items: %s', $reportProcessing['amountFailedItems']));
+            $io->note(sprintf('Success Items: %s', $reportProcessing['amountSuccessesItems']));
 
             $io->note(sprintf('Time processed: %s', $time));
             $io->note(sprintf('Get memory: %s', (int)(memory_get_peak_usage() / 1024).' KB'));
 
-            $fileName = 'files/logFailureItems.csv';
-//            unlink($fileName);
-        }
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
-    }
 
-    public function getCurrentMemorySize()
-    {
-        return (int)(memory_get_usage() / 1024).' KB';
+        }
+        $io->success('File was reading successful');
     }
 }

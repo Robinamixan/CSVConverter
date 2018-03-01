@@ -35,6 +35,8 @@
                             <div>Amount of processed inserts - {{ amountProcessedItems }}</div>
                             <div>Amount of failed inserts - {{ amountFailedItems }}</div>
                             <div>Amount of success inserts - {{ amountSuccessesItems }}</div>
+                            <div>time passed - {{ processingTime }}</div>
+                            <div>Amount of memory - {{ amountMemory }}</div>
                             <div>
                                 Failed records:
                                 <table id="failed_records_list">
@@ -48,15 +50,15 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {#{% for record in failedRecords %}#}
-                                        {#<tr>#}
-                                            {#{% for key, contain in record %}#}
-                                                {#<td>#}
-                                                    {#{{ contain }}#}
-                                                {#</td>#}
-                                            {#{% endfor %}#}
-                                        {#</tr>#}
-                                    {#{% endfor %}#}
+                                    {% for record in failedRecords %}
+                                        <tr>
+                                            {% for key, contain in record %}
+                                                <td>
+                                                    {{ contain }}
+                                                </td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
