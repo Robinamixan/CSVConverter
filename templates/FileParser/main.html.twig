@@ -32,9 +32,11 @@
                     {% if failedRecords %}
 
                         <div id="inserts_report">
-                            <div>Amount of processed inserts - {{ amountProcessed }}</div>
-                            <div>Amount of failed inserts - {{ amountFailed }}</div>
-                            <div>Amount of success inserts - {{ amountSuccesses }}</div>
+                            <div>Amount of processed inserts - {{ amountProcessedItems }}</div>
+                            <div>Amount of failed inserts - {{ amountFailedItems }}</div>
+                            <div>Amount of success inserts - {{ amountSuccessesItems }}</div>
+                            <div>time passed - {{ processingTime }}</div>
+                            <div>Amount of memory - {{ amountMemory }}</div>
                             <div>
                                 Failed records:
                                 <table id="failed_records_list">

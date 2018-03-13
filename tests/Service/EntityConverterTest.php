@@ -8,10 +8,10 @@
 
 namespace App\Tests\Service;
 
-use App\Entity\ProductData;
-use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductDataConverter;
+use App\Entity\Product;
+use App\Service\EntityConverter\ArrayToEntityConverters\ArrayToProductConverter;
 use App\Service\EntityConverter\EntityConverter;
-use App\Service\EntityConverter\EntityToArrayConverters\ProductDataToArrayConverter;
+use App\Service\EntityConverter\EntityToArrayConverters\ProductToArrayConverter;
 use PHPUnit\Framework\TestCase;
 
 class EntityConverterTest extends TestCase
@@ -29,7 +29,7 @@ class EntityConverterTest extends TestCase
             'product_discontinued' => 'yes'
             ];
 
-        $record = $entityConverter->convertArrayToEntity($item, new ArrayToProductDataConverter());
+        $record = $entityConverter->convertArrayToEntity($item, new ArrayToProductConverter());
         $this->assertEquals('P0004', $record->getProductCode());
         $this->assertEquals(24.55, $record->getProductCost());
         $this->assertEquals(false, is_null($record->getDiscontinuedDate()));
@@ -48,7 +48,7 @@ class EntityConverterTest extends TestCase
             'product_discontinued' => 'yes'
         ];
 
-        $record = new ProductData();
+        $record = new Product();
         $record->setProductName('Bluray Player');
         $record->setProductCode('P0004');
         $record->setProductDesc('Watch it in HD');
@@ -57,7 +57,7 @@ class EntityConverterTest extends TestCase
         $record->setAddedDate(new \DateTime());
         $record->setDiscontinuedDate(new \DateTime());
 
-        $resultArray = $entityConverter->convertEntityToArray($record, new ProductDataToArrayConverter());
+        $resultArray = $entityConverter->convertEntityToArray($record, new ProductToArrayConverter());
         $this->assertEquals($item, $resultArray);
     }
 }

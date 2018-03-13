@@ -31,3 +31,6 @@ framework:
 
 
     validation: { enable_annotations: true }
+
+    profiler:
+        enabled: false

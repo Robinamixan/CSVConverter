@@ -20,14 +20,15 @@ class ReaderTest extends TestCase
 
         file_put_contents($testFilePath, "a,b,c\n", FILE_APPEND);
         file_put_contents($testFilePath, "d,e,f\n", FILE_APPEND);
+        $testAssertArray = ['a' => 'd', 'b' => 'e', 'c' => 'f'];
 
         $testFile = new \SplFileObject($testFilePath, 'r');
 
-        $testContain1 = [0 => ['a' => 'd', 'b' => 'e', 'c' => 'f']];
-        $testContain2 = $reader->loadFileToArray($testFile);
+        $reader->setFileForRead($testFile);
+        $testResultArray = $reader->getNextItem();
 
         unlink($testFilePath);
-        $this->assertEquals($testContain1, $testContain2);
+        $this->assertEquals($testAssertArray,$testResultArray);
     }
 
     public function testErrorReadFile()
@@ -40,7 +41,7 @@ class ReaderTest extends TestCase
         file_put_contents($testFilePath, "test", FILE_APPEND);
 
         $testFile = new \SplFileObject($testFilePath, 'r');
-        $reader->loadFileToArray($testFile);
+        $reader->setFileForRead($testFile);
 
         unlink($testFilePath);
     }

@@ -18,6 +18,10 @@
                 <source>Load File</source>
                 <target>Загрузить файл</target>
             </trans-unit>
+            <trans-unit id="form_load_file_error_message">
+                <source>Any stock item which costs less that $5 and has less than 10 stock will not be imported.</source>
+                <target>Любая запись, у которой стоимость меньше $5 и количество меньше 10, не должна быть добавлена</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
